@@ -9,15 +9,21 @@ public class Health : MonoBehaviour, IDamageable
     
     [SerializeField] private int _maxHealt;
     [SerializeField] private Invulnerability _invulnerability;
+    [SerializeField] private Movement _movement;
 
     private int _currentHealth;
+
+    private Vector3 topRight;
+    private Vector3 bottomLeft;
     
     void Start()
     {
         _currentHealth = _maxHealt;
         HealthChanged?.Invoke(_currentHealth);
+        
     }
     
+
     public void TakeDamage(int damage)
     {
         if (_invulnerability.Invulnerable)
@@ -40,6 +46,12 @@ public class Health : MonoBehaviour, IDamageable
             _currentHealth = 0;
             Death();
         }
+    }
+
+    public void TakeBorderDamage(int damage)
+    {
+        TakeDamage(damage);
+        _movement.SetPlayerInInitPosition();
     }
 
     private void Death()

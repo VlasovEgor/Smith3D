@@ -64,11 +64,14 @@ public class LevelManager : MonoBehaviour, IInitializable, IDisposable
          return;
       }
       
-      if (Input.GetMouseButtonDown(0) && !_screenIsTapped)
+      if (Input.touchCount > 0)
       {
-         
-         _screenIsTapped = true;
-         GameStarted?.Invoke();
+         Touch touch = Input.GetTouch(0);
+         if (touch.phase == TouchPhase.Began && !_screenIsTapped)
+         {
+            _screenIsTapped = true;
+            GameStarted?.Invoke();
+         }
       }
    }
 

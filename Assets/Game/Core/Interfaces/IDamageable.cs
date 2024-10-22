@@ -8,4 +8,5 @@ public interface IDamageable
   public event Action PlayerDied;
   
   void TakeDamage(int damage);
+  void TakeBorderDamage(int damage);
 }
