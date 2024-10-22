@@ -1,15 +1,24 @@
+using System;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-   [SerializeField] private Collider2D _playerCollider2D;
-   [SerializeField] private Rigidbody2D _playerRigidbody2D;
+   [SerializeField] private Collider _playerCollider;
+   [SerializeField] private Rigidbody _playerRigidbody;
    [SerializeField] private GameObject _player;
+
+   [SerializeField] private CharacterController _playerCharacterController;
+
+   [SerializeField] private Camera _mainCamera;
+
+   private Plane _plane = new(-Vector3.forward,Vector3.zero);
    
    private bool _isPlayer;
    private bool _playerIsMoving;
    
-   private Vector3 _mousePosition;
+   private Vector3 _movePoint;
+   
+   private const float StopDistance = 0.2f; 
 
    private void Update()
    {
@@ -18,15 +27,20 @@ public class Movement : MonoBehaviour
 
    private void CheckingAbilityMove()
    {    
-       _mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+       Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+       float distance;
+       _plane.Raycast(ray, out distance);
+       _movePoint = ray.GetPoint(distance);
        
+
        if (Input.GetMouseButtonDown(0))
        {
-           Collider2D targetObject = Physics2D.OverlapPoint(_mousePosition);
-            
-           if (targetObject)
+           RaycastHit hit;
+           if (Physics.Raycast(ray, out hit))
            {
-               _isPlayer = targetObject == _playerCollider2D;
+               Transform objectHit = hit.transform;
+            
+               _isPlayer = objectHit == _player.transform;
            }
        }
        
@@ -44,13 +58,33 @@ public class Movement : MonoBehaviour
            _playerIsMoving = false;
        }
    }
-   
+
    private void FixedUpdate()
    {
-       if (_playerIsMoving)
-       {    
-           _playerRigidbody2D.MovePosition(_mousePosition);
-       }
+       Move();
+   }
+
+   private void Move()
+   {
+      
+      if (_playerIsMoving)
+      {
+          Vector3 direction = (_movePoint - _player.transform.position).normalized;
+          float distanceToTarget = Vector3.Distance(_player.transform.position, _movePoint);
+
+          if (distanceToTarget > StopDistance)
+          {
+              _playerRigidbody.velocity = direction * 10;
+          }
+          else
+          {
+              _playerRigidbody.velocity = Vector3.zero;
+          }
+      }
+      else
+      {
+          _playerRigidbody.velocity = Vector3.zero;
+      }
    }
 
    public void SetPlayerInInitPosition()

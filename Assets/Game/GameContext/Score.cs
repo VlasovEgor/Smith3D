@@ -99,7 +99,6 @@ public class Score : MonoBehaviour, IInitializable, IDisposable
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
         
-        Debug.Log(_valueRewards.Value);
         _score += _valueRewards.Value[type];
         ScoreChanged.Invoke(_score);
     }
